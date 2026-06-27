@@ -2,7 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#09B183">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FripIA">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>FripIA — Vends mieux sur Vinted</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
@@ -30,19 +38,36 @@
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
+  }
+  body {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* ── HEADER ── */
   header {
     background: white;
     border-bottom: 1px solid var(--border);
-    padding: 14px 20px;
+    padding: calc(14px + env(safe-area-inset-top)) 20px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 100;
+  }
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .app-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(9,177,131,0.22);
+    flex-shrink: 0;
   }
   .logo {
     font-family: 'DM Serif Display', serif;
@@ -81,28 +106,36 @@
   /* ── NAV ── */
   nav {
     background: white;
-    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
     display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.06);
   }
   nav button {
     flex: 1;
-    padding: 13px;
+    min-height: 64px;
+    padding: 8px 6px 9px;
     background: none;
     border: none;
     font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
-    border-bottom: 2px solid transparent;
+    border-top: 3px solid transparent;
     transition: all 0.2s;
     letter-spacing: 0.3px;
   }
-  nav button.active { color: var(--green); border-bottom-color: var(--green); }
+  nav button.active { color: var(--green); border-top-color: var(--green); }
   nav button:hover:not(.active) { color: var(--text); }
 
   /* ── PAGES ── */
-  .page { display: none; padding: 20px; max-width: 500px; margin: 0 auto; }
+  .page { display: none; padding: 18px 20px 28px; max-width: 500px; margin: 0 auto; }
   .page.active { display: block; }
 
   /* ── API BOX ── */
@@ -175,6 +208,47 @@
   .drop-zone p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
   input[type="file"] { display: none; }
+
+  .install-card {
+    display: none;
+    background: #F0FBF7;
+    border: 1px solid #CBEFE5;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .install-card.show { display: block; }
+  .install-card h2 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+  .install-card p { font-size: 12px; color: var(--text-mid); line-height: 1.55; }
+  .install-card button {
+    margin-top: 10px;
+    background: transparent;
+    border: none;
+    color: var(--green-mid);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .photo-guide {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: -6px 0 16px;
+  }
+  .photo-guide span {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 6px;
+    text-align: center;
+    color: var(--text-mid);
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.04);
+  }
 
   /* ── PHOTOS SECTION ── */
   .photos-header {
@@ -471,6 +545,20 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  [contenteditable="true"] {
+    outline: none;
+    border-radius: 8px;
+  }
+  [contenteditable="true"]:focus {
+    box-shadow: 0 0 0 3px rgba(9,177,131,0.16);
+    background: white;
+  }
+  .edit-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-align: right;
+  }
 
   /* Erreur */
   .error-box {
@@ -574,7 +662,7 @@
   /* ── TOAST ── */
   .toast {
     position: fixed;
-    bottom: 24px; left: 50%;
+    bottom: calc(92px + env(safe-area-inset-bottom)); left: 50%;
     transform: translateX(-50%) translateY(80px);
     background: var(--text);
     color: white;
@@ -594,9 +682,12 @@
 <body>
 
 <header>
-  <div>
-    <div class="logo">Frip<span>IA</span></div>
-    <span class="logo-tag">Génère tes annonces Vinted</span>
+  <div class="brand-lockup">
+    <img class="app-icon" src="icons/logo-header.png" alt="" width="42" height="42">
+    <div>
+      <div class="logo">Frip<span>IA</span></div>
+      <span class="logo-tag">Génère tes annonces Vinted</span>
+    </div>
   </div>
   <div class="header-right">
     <div class="col-pill" onclick="showPage('armoire')">Armoire · <strong id="count-badge">0</strong></div>
@@ -612,12 +703,26 @@
 <!-- ══ PAGE SCAN ══ -->
 <div class="page active" id="page-scan">
 
+  <div class="install-card" id="install-card">
+    <h2>Installer FripIA sur l'iPhone</h2>
+    <p>Ouvre cette page dans Safari, touche Partager, puis choisis “Sur l'écran d'accueil”. FripIA s'ouvrira ensuite comme une vraie app.</p>
+    <button onclick="dismissInstallCard()">Masquer</button>
+  </div>
+
   <!-- Drop zone principale -->
   <div id="drop-zone" class="drop-zone" onclick="triggerFile('file-main')"
     ondragover="ev(event,'add')" ondragleave="ev(event,'rm')" ondrop="handleDrop(event)">
     <span class="drop-icon">👗</span>
     <h2>Ajoute tes photos</h2>
     <p>Jusqu'à 6 photos : vêtement, étiquettes<br>détails, défauts, porté sur soi</p>
+  </div>
+  <div class="photo-guide" id="photo-guide">
+    <span>Face</span>
+    <span>Dos</span>
+    <span>Marque</span>
+    <span>Composition</span>
+    <span>Défaut</span>
+    <span>Porté</span>
   </div>
   <input type="file" id="file-main" accept="image/*" capture="environment" onchange="addPhoto(event)">
   <input type="file" id="file-extra" accept="image/*" onchange="addPhoto(event)" multiple>
@@ -667,7 +772,7 @@
         <div class="result-top">
           <div>
             <div class="result-brand" id="r-brand">—</div>
-            <div class="result-name" id="r-name">—</div>
+            <div class="result-name" id="r-name" contenteditable="true" oninput="syncEditedResult()">—</div>
             <div class="result-size" id="r-size">—</div>
           </div>
           <div class="conf-badge" id="r-conf-badge">—%</div>
@@ -727,7 +832,8 @@
             <h4>📋 Description Vinted</h4>
             <button class="copy-btn" id="copy-btn" onclick="copyDesc()">Copier</button>
           </div>
-          <div class="desc-box" id="r-desc">—</div>
+          <div class="desc-box" id="r-desc" contenteditable="true" spellcheck="true" oninput="syncEditedResult()">—</div>
+          <div class="edit-hint">Tu peux modifier le texte avant de copier.</div>
         </div>
 
         <div id="error-box" class="error-box" style="display:none;"></div>
@@ -812,6 +918,7 @@ let apiKey = localStorage.getItem('pepite_apikey') || '';
 let priceMemory = JSON.parse(localStorage.getItem('fripia_price_memory') || '[]');
 const MAX_PHOTOS = 6;
 const API_MASK = '••••••••••••••••';
+const PHOTO_LABELS = ['Face', 'Dos', 'Étiquette marque', 'Composition', 'Défaut', 'Porté'];
 
 // Deeplink : fripia.html?key=TACLÉ → sauvegarde automatique
 (function() {
@@ -844,6 +951,8 @@ function init() {
   }
   renderArmoire();
   updateBadge();
+  setupInstallCard();
+  registerServiceWorker();
 }
 
 function setStatus(ok) {
@@ -888,6 +997,29 @@ function openApiModal() {
 
 function closeApiModal() {
   document.getElementById('api-modal')?.classList.remove('show');
+}
+
+function isStandaloneApp() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function setupInstallCard() {
+  const card = document.getElementById('install-card');
+  if (!card) return;
+  const dismissed = localStorage.getItem('fripia_install_dismissed') === '1';
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (isIOS && !isStandaloneApp() && !dismissed) card.classList.add('show');
+}
+
+function dismissInstallCard() {
+  localStorage.setItem('fripia_install_dismissed', '1');
+  document.getElementById('install-card')?.classList.remove('show');
+}
+
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
 function showPage(name) {
@@ -936,7 +1068,7 @@ function updatePhotoUI() {
   photos.forEach((p, i) => {
     const d = document.createElement('div');
     d.className = 'photo-slot filled';
-    d.innerHTML = `<img src="${p.dataUrl}"><button class="remove-photo" onclick="removePhoto(${i})">✕</button><div class="slot-label">Photo ${i+1}</div>`;
+    d.innerHTML = `<img src="${p.dataUrl}"><button class="remove-photo" onclick="removePhoto(${i})">✕</button><div class="slot-label">${PHOTO_LABELS[i] || 'Photo ' + (i+1)}</div>`;
     grid.appendChild(d);
   });
 }
@@ -967,8 +1099,33 @@ function buildPriceMemoryPrompt() {
   return `\n\nMÉMOIRE DE PRIX UTILISATEUR\nVoici les dernières corrections de prix enregistrées sur cet appareil. Utilise-les pour calibrer ton prix conseillé quand le vêtement actuel ressemble à ces cas, sans les copier aveuglément :\n${lines}`;
 }
 
+function stripBrokenSurrogates(text) {
+  let clean = '';
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code >= 0xD800 && code <= 0xDBFF) {
+      const next = text.charCodeAt(i + 1);
+      if (next >= 0xDC00 && next <= 0xDFFF) {
+        clean += text[i] + text[i + 1];
+        i++;
+      }
+    } else if (code < 0xDC00 || code > 0xDFFF) {
+      clean += text[i];
+    }
+  }
+  return clean;
+}
+
 function normalizeDescription(desc) {
-  return String(desc || '').replace(/^[♦◆◇🔸]\s*/gm, '🔹 ');
+  return stripBrokenSurrogates(String(desc || '')
+    .replace(/\uFFFD/g, '')
+  )
+    .replace(/^[\s\uFEFF]*(?:♦|◆|◇|🔸)\s*/gmu, '🔹 ')
+    .replace(/^[\s\uFEFF]*🔹\s*/gmu, '🔹 ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 async function analyzeImages() {
@@ -989,7 +1146,7 @@ async function analyzeImages() {
 
   photos.forEach((p, i) => {
     parts.push({ inline_data: { mime_type: p.dataUrl.split(';')[0].split(':')[1], data: p.dataUrl.split(',')[1] } });
-    if (photos.length > 1) parts.push({ text: `[Photo ${i+1}${i===0?' - vêtement':i===1?' - étiquette marque':i===2?' - étiquette composition':' - vue supplémentaire'}]` });
+    if (photos.length > 1) parts.push({ text: `[Photo ${i+1} - ${PHOTO_LABELS[i] || 'vue supplémentaire'}]` });
   });
 
   const obsBlock = obs ? `\n\nPrécisions de l'utilisateur : ${obs}` : '';
@@ -1000,6 +1157,7 @@ async function analyzeImages() {
 Tu t'inspires du style de ce vendeur modèle dont voici la méthode exacte :
 - Titre court et précis : adjectif + type de vêtement + marque (ex: "Robe d'été légère Mango", "Top vintage y2k Cop Copine")
 - Description en points losange bleu 🔹, une info par ligne, ultra lisible
+- Chaque ligne de description commence par un seul "🔹 " puis le texte. N'utilise jamais le caractère de remplacement Unicode U+FFFD, ni symbole cassé, ni double symbole après le losange.
 - Ordre strict : type/couleur → matière/coupe → détails pratiques (poches, fermetures, élastiques) → taille réelle (avec équivalence si ça taille différemment) → état honnête
 - Honnêteté totale sur les défauts avec ⚠ : "attention ⚠ quelques bouloches assez discret"
 - Préciser la taille réelle si elle diffère de l'étiquette : "Taille XS indiquée mais convient pour un S/36"
@@ -1196,9 +1354,20 @@ function displayError(msg) {
   document.getElementById('save-btn').disabled = true;
 }
 
+function syncEditedResult() {
+  if (!currentResult) return;
+  const title = document.getElementById('r-name')?.textContent.trim();
+  const desc = document.getElementById('r-desc')?.textContent;
+  if (title && title !== '—') currentResult.titre_vinted = title;
+  if (desc && desc !== '—') currentResult.description_vinted = normalizeDescription(desc);
+}
+
 function copyDesc() {
-  const desc = document.getElementById('r-desc').textContent;
+  syncEditedResult();
+  const descBox = document.getElementById('r-desc');
+  const desc = normalizeDescription(descBox.textContent);
   if (!desc || desc === '—') return;
+  descBox.textContent = desc;
   navigator.clipboard.writeText(desc).then(() => {
     const btn = document.getElementById('copy-btn');
     btn.textContent = '✓ Copié !';
@@ -1242,10 +1411,11 @@ function savePriceFeedback() {
 
 function saveToArmoire() {
   if (!currentResult) return;
+  syncEditedResult();
   armoire.unshift({
     id: Date.now(),
     marque: currentResult.marque,
-    modele: currentResult.modele,
+    modele: currentResult.titre_vinted || currentResult.modele,
     taille: currentResult.taille,
     etat: currentResult.etat_vinted,
     prix_conseille: currentResult.prix_conseille,
