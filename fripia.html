@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FripIA — Vends mieux sur Vinted</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #09B183;
+    --green-light: #E8FAF5;
+    --green-mid: #07906A;
+    --bg: #FAFAF8;
+    --bg-card: #FFFFFF;
+    --bg-soft: #F5F5F3;
+    --text: #1A1A1A;
+    --text-mid: #555;
+    --text-muted: #999;
+    --border: #EFEFED;
+    --danger: #E05252;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --shadow-lg: 0 4px 24px rgba(0,0,0,0.1);
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--green); }
+  .logo-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-top: -2px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .col-pill {
+    font-size: 12px;
+    color: var(--text-mid);
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+  }
+  .col-pill:hover { border-color: var(--green); color: var(--green); }
+  .col-pill strong { color: var(--green); }
+
+  /* ── NAV ── */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+  }
+  nav button {
+    flex: 1;
+    padding: 13px;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  nav button.active { color: var(--green); border-bottom-color: var(--green); }
+  nav button:hover:not(.active) { color: var(--text); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 20px; max-width: 500px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── API BOX ── */
+  .api-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .input-row { display: flex; gap: 8px; }
+  .input-row input {
+    flex: 1;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-row input:focus { border-color: var(--green); }
+  .save-btn {
+    padding: 10px 16px;
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .save-btn:hover { background: var(--green-mid); }
+  .api-status { font-size: 11px; margin-top: 6px; }
+  .api-status.ok { color: var(--green); }
+  .api-status.missing { color: var(--text-muted); }
+
+  /* ── DROP ZONE ── */
+  .drop-zone {
+    background: white;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .drop-icon { font-size: 36px; display: block; margin-bottom: 12px; }
+  .drop-zone h2 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .drop-zone p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  input[type="file"] { display: none; }
+
+  /* ── PHOTOS SECTION ── */
+  .photos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .photos-header h3 { font-size: 13px; font-weight: 600; color: var(--text-mid); }
+  .add-btn {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green);
+    background: var(--green-light);
+    border: none;
+    border-radius: 20px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .add-btn:hover { background: #C8F0E7; }
+
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .photo-slot {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-soft);
+    border: 1.5px dashed var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+  }
+  .photo-slot.filled { border-style: solid; border-color: var(--border); }
+  .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-slot .slot-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.45);
+    font-size: 9px;
+    color: white;
+    text-align: center;
+    padding: 3px;
+  }
+  .photo-slot .slot-icon { font-size: 20px; color: var(--text-muted); }
+  .remove-photo {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 20px; height: 20px;
+    background: rgba(0,0,0,0.55);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-slot.filled:hover .remove-photo { display: flex; }
+
+  /* ── OBSERVATIONS ── */
+  .obs-wrap { margin-bottom: 16px; }
+  .obs-wrap textarea {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 76px;
+    box-shadow: var(--shadow);
+  }
+  .obs-wrap textarea:focus { border-color: var(--green); }
+  .obs-wrap textarea::placeholder { color: var(--text-muted); }
+
+  /* ── BOUTONS ── */
+  .btn {
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-green { background: var(--green); color: white; flex: 1; }
+  .btn-green:hover { background: var(--green-mid); }
+  .btn-green:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-ghost { background: white; color: var(--text-mid); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: #CCC; }
+  .btn-danger { background: white; color: var(--danger); border: 1px solid #F5DADA; font-size: 13px; }
+  .btn-danger:hover { background: #FFF5F5; }
+  .btn-row { display: flex; gap: 10px; }
+
+  /* ── LOADER ── */
+  .loader-wrap {
+    text-align: center;
+    padding: 50px 20px;
+  }
+  .loader-ring {
+    width: 56px; height: 56px;
+    border: 3px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-wrap h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .loader-wrap p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .loader-step { margin-top: 14px; font-size: 12px; color: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  /* ── RESULT CARD ── */
+  .result-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    margin-bottom: 14px;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .result-photos {
+    display: grid;
+    gap: 2px;
+    background: var(--bg-soft);
+  }
+  .result-photos.one { grid-template-columns: 1fr; }
+  .result-photos.two { grid-template-columns: 1fr 1fr; }
+  .result-photos.three { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+  .result-photos.four { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .result-photo { aspect-ratio: 1; overflow: hidden; }
+  .result-photos.three .result-photo:first-child { grid-row: 1/3; aspect-ratio: auto; }
+  .result-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .result-body { padding: 16px; }
+
+  .result-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .result-brand { font-size: 12px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; }
+  .result-name { font-size: 16px; font-weight: 700; color: var(--text); margin-top: 2px; line-height: 1.3; }
+  .result-size { font-size: 13px; color: var(--text-mid); margin-top: 2px; }
+
+  .conf-badge {
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Prix */
+  .prix-bloc {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .prix-item {
+    background: var(--bg-soft);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .prix-item .plabel { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
+  .prix-item .pval { font-size: 16px; font-weight: 700; color: var(--text); }
+  .prix-item .pval.green { color: var(--green); font-size: 18px; }
+  .prix-item .psource { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Tags */
+  .tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag {
+    background: var(--green-light);
+    color: var(--green-mid);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .tag.gray { background: var(--bg-soft); color: var(--text-mid); }
+
+  /* Infos */
+  .info-rows { margin-bottom: 14px; }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg-soft);
+    gap: 12px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .ilabel { color: var(--text-muted); font-size: 12px; }
+  .info-row .ival { color: var(--text); text-align: right; font-weight: 500; }
+
+  /* Fiabilité bar */
+  .conf-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .conf-label { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+  .conf-track { flex: 1; height: 5px; background: var(--bg-soft); border-radius: 3px; overflow: hidden; }
+  .conf-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 1s ease; }
+  .conf-pct { font-size: 13px; font-weight: 700; color: var(--green); flex-shrink: 0; }
+
+  /* Description Vinted */
+  .desc-section { margin-bottom: 14px; }
+  .desc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .desc-header h4 { font-size: 13px; font-weight: 600; color: var(--text); }
+  .copy-btn {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    background: var(--green);
+    border: none;
+    border-radius: 20px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover { background: var(--green-mid); }
+  .copy-btn.copied { background: #555; }
+  .desc-box {
+    background: var(--bg-soft);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Erreur */
+  .error-box {
+    background: #FFF5F5;
+    border: 1px solid #F5DADA;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── ARMOIRE (collection) ── */
+  .armoire-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  .armoire-header h2 { font-size: 20px; font-weight: 700; color: var(--text); }
+  .armoire-total { font-size: 12px; color: var(--text-muted); }
+  .armoire-total strong { color: var(--green); font-size: 15px; font-weight: 700; }
+
+  .armoire-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .armoire-item {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: box-shadow 0.2s;
+  }
+  .armoire-item:hover { box-shadow: var(--shadow-lg); }
+  .armoire-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--bg-soft); }
+  .armoire-thumb-empty { width: 100%; aspect-ratio: 1; background: var(--bg-soft); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .armoire-info { padding: 10px 12px; }
+  .armoire-brand { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; }
+  .armoire-name { font-size: 13px; font-weight: 600; color: var(--text); margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .armoire-price { font-size: 14px; font-weight: 700; color: var(--text); }
+  .armoire-state { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+  .armoire-del {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 24px; height: 24px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-muted);
+    font-size: 10px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .armoire-item:hover .armoire-del { display: flex; }
+
+  .empty-armoire { text-align: center; padding: 60px 20px; }
+  .empty-armoire .eico { font-size: 44px; margin-bottom: 14px; opacity: 0.2; }
+  .empty-armoire h3 { font-size: 18px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+  .empty-armoire p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+  /* ── SETTINGS ── */
+  .settings-sec { margin-bottom: 28px; }
+  .settings-sec h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .stat-row { display: flex; justify-content: space-between; font-size: 13px; padding: 9px 0; border-bottom: 1px solid var(--bg-soft); color: var(--text-muted); }
+  .stat-row strong { color: var(--text); font-weight: 600; }
+  .stat-row .sgreen { color: var(--green); font-weight: 700; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: white;
+    padding: 11px 20px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Frip<span>IA</span></div>
+    <span class="logo-tag">Génère tes annonces Vinted</span>
+  </div>
+  <div class="header-right">
+    <div class="col-pill" onclick="showPage('armoire')">Armoire · <strong id="count-badge">0</strong></div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage('scan')" id="nav-scan">📷 Analyser</button>
+  <button onclick="showPage('armoire')" id="nav-armoire">👗 Armoire</button>
+  <button onclick="showPage('settings')" id="nav-settings">⚙ Réglages</button>
+</nav>
+
+<!-- ══ PAGE SCAN ══ -->
+<div class="page active" id="page-scan">
+
+  <div class="api-box">
+    <span class="field-label">Clé API Gemini</span>
+    <div class="input-row">
+      <input type="password" id="api-input" placeholder="AIza..." autocomplete="off">
+      <button class="save-btn" onclick="saveApiKey('api-input')">Sauver</button>
+    </div>
+    <div class="api-status missing" id="api-status">○ Clé requise pour l'analyse</div>
+  </div>
+
+  <!-- Drop zone principale -->
+  <div id="drop-zone" class="drop-zone" onclick="triggerFile('file-main')"
+    ondragover="ev(event,'add')" ondragleave="ev(event,'rm')" ondrop="handleDrop(event)">
+    <span class="drop-icon">👗</span>
+    <h2>Ajoute tes photos</h2>
+    <p>Appuyez pour choisir jusqu'à 6 photos<br>depuis votre galerie ou appareil photo</p>
+  </div>
+  <input type="file" id="file-main" accept="image/*" onchange="addPhoto(event)" multiple>
+  <input type="file" id="file-extra" accept="image/*" onchange="addPhoto(event)" multiple>
+
+  <!-- Photos ajoutées -->
+  <div id="photos-section" style="display:none; margin-bottom:16px;">
+    <div class="photos-header">
+      <h3>Photos · <span id="photos-count">0</span>/4</h3>
+      <button class="add-btn" id="add-more-btn" onclick="triggerFile('file-extra')">+ Ajouter</button>
+    </div>
+    <div class="photos-grid" id="photos-grid"></div>
+  </div>
+
+  <!-- Observations -->
+  <div id="obs-section" style="display:none;" class="obs-wrap">
+    <span class="field-label">Précisions (optionnel)</span>
+    <textarea id="obs-text" placeholder="Ex : taille L, porté 2 fois, étiquette encore présente, petite tache sur la manche droite, couleur bordeaux…"></textarea>
+  </div>
+
+  <!-- Analyser -->
+  <div id="analyze-section" style="display:none; margin-bottom:16px;">
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="resetScan()">← Recommencer</button>
+      <button class="btn btn-green" id="analyze-btn" onclick="analyzeImages()">✨ Générer l'annonce</button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div id="loader-section" style="display:none;">
+    <div class="loader-wrap">
+      <div class="loader-ring"></div>
+      <h3>Analyse en cours…</h3>
+      <p>Identification de la marque<br>Recherche des prix Vinted</p>
+      <div class="loader-step" id="loader-step">Lecture des étiquettes…</div>
+    </div>
+  </div>
+
+  <!-- Résultat -->
+  <div id="result-section" style="display:none;">
+
+    <div class="result-card">
+      <!-- Photos en mosaïque -->
+      <div class="result-photos one" id="result-photos-grid"></div>
+
+      <div class="result-body">
+        <!-- Top : nom + badge fiabilité -->
+        <div class="result-top">
+          <div>
+            <div class="result-brand" id="r-brand">—</div>
+            <div class="result-name" id="r-name">—</div>
+            <div class="result-size" id="r-size">—</div>
+          </div>
+          <div class="conf-badge" id="r-conf-badge">—%</div>
+        </div>
+
+        <!-- Prix -->
+        <div class="prix-bloc">
+          <div class="prix-item">
+            <div class="plabel">Prix neuf</div>
+            <div class="pval" id="p-neuf">—</div>
+            <div class="psource" id="p-neuf-src"></div>
+          </div>
+          <div class="prix-item">
+            <div class="plabel">Prix conseillé</div>
+            <div class="pval green" id="p-conseil">—</div>
+            <div class="psource">sur Vinted</div>
+          </div>
+          <div class="prix-item">
+            <div class="plabel">Dernière vente</div>
+            <div class="pval" id="p-derniere">—</div>
+            <div class="psource" id="p-derniere-src"></div>
+          </div>
+        </div>
+
+        <!-- Fiabilité -->
+        <div class="conf-row">
+          <span class="conf-label">Fiabilité</span>
+          <div class="conf-track"><div class="conf-fill" id="conf-fill" style="width:0%"></div></div>
+          <span class="conf-pct" id="conf-pct">—</span>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags-row" id="r-tags"></div>
+
+        <!-- Infos -->
+        <div class="info-rows">
+          <div class="info-row"><span class="ilabel">Catégorie Vinted</span><span class="ival" id="r-cat">—</span></div>
+          <div class="info-row"><span class="ilabel">État Vinted</span><span class="ival" id="r-etat">—</span></div>
+          <div class="info-row"><span class="ilabel">Composition</span><span class="ival" id="r-compo">—</span></div>
+          <div class="info-row"><span class="ilabel">Entretien</span><span class="ival" id="r-entretien">—</span></div>
+        </div>
+
+        <!-- Description Vinted -->
+        <div class="desc-section">
+          <div class="desc-header">
+            <h4>📋 Description Vinted</h4>
+            <button class="copy-btn" id="copy-btn" onclick="copyDesc()">Copier</button>
+          </div>
+          <div class="desc-box" id="r-desc">—</div>
+        </div>
+
+        <div id="error-box" class="error-box" style="display:none;"></div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="resetScan()">← Nouveau</button>
+          <button class="btn btn-green" id="save-btn" onclick="saveToArmoire()">+ Armoire</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ PAGE ARMOIRE ══ -->
+<div class="page" id="page-armoire">
+  <div class="armoire-header">
+    <h2>Mon Armoire</h2>
+    <div class="armoire-total">Total : <strong id="armoire-total">0 €</strong></div>
+  </div>
+  <div id="armoire-grid" class="armoire-grid"></div>
+  <div id="armoire-empty" class="empty-armoire">
+    <div class="eico">👗</div>
+    <h3>Armoire vide</h3>
+    <p>Analysez votre premier vêtement<br>pour démarrer votre armoire.</p>
+  </div>
+</div>
+
+<!-- ══ PAGE RÉGLAGES ══ -->
+<div class="page" id="page-settings">
+  <div class="settings-sec">
+    <h3>Clé API Gemini</h3>
+    <div class="api-box" style="margin-bottom:0;">
+      <div class="input-row">
+        <input type="password" id="api-input-2" placeholder="AIza..." autocomplete="off">
+        <button class="save-btn" onclick="saveApiKey('api-input-2')">Sauver</button>
+      </div>
+      <div class="api-status missing" id="api-status-2">○ Clé requise</div>
+    </div>
+  </div>
+  <div class="settings-sec">
+    <h3>Mon armoire</h3>
+    <div class="stat-row"><span>Vêtements</span><strong id="st-count">0</strong></div>
+    <div class="stat-row"><span>Valeur totale estimée</span><span class="sgreen" id="st-total">0 €</span></div>
+    <div class="stat-row"><span>Pièce la plus chère</span><strong id="st-top">—</strong></div>
+  </div>
+  <div class="settings-sec">
+    <h3>Danger</h3>
+    <button class="btn btn-danger" onclick="clearArmoire()">🗑 Effacer l'armoire</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let photos = [];
+let currentResult = null;
+let armoire = JSON.parse(localStorage.getItem('fripia_armoire') || '[]');
+let apiKey = localStorage.getItem('pepite_apikey') || '';
+
+// Deeplink : fripia.html?key=TACLÉ → sauvegarde automatique
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const k = params.get('key');
+  if (k && k.length > 10) {
+    apiKey = k;
+    localStorage.setItem('pepite_apikey', k);
+    // Nettoie l'URL sans recharger
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
+const STEPS = [
+  'Lecture des étiquettes…',
+  'Identification de la marque…',
+  'Recherche des prix Vinted…',
+  'Analyse de l\'état…',
+  'Rédaction de l\'annonce…',
+];
+let stepTimer;
+
+function init() {
+  if (apiKey) {
+    document.getElementById('api-input').value = '••••••••••••••••';
+    document.getElementById('api-input-2').value = '••••••••••••••••';
+    setStatus(true);
+  }
+  renderArmoire();
+  updateBadge();
+}
+
+function setStatus(ok) {
+  ['api-status','api-status-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = ok ? '✓ Clé configurée' : '○ Clé requise pour l\'analyse';
+    el.className = 'api-status ' + (ok ? 'ok' : 'missing');
+  });
+}
+
+function saveApiKey(inputId) {
+  const v = document.getElementById(inputId).value.trim();
+  if (v && !v.startsWith('•')) {
+    apiKey = v;
+    localStorage.setItem('pepite_apikey', v);
+    document.getElementById('api-input').value = '••••••••••••••••';
+    document.getElementById('api-input-2').value = '••••••••••••••••';
+    setStatus(true);
+    showToast('Clé API sauvegardée ✓');
+  }
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'armoire') renderArmoire();
+  if (name === 'settings') updateStats();
+}
+
+function triggerFile(id) { document.getElementById(id).click(); }
+function ev(e, action) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList[action === 'add' ? 'add' : 'remove']('dragover');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  [...e.dataTransfer.files].filter(f => f.type.startsWith('image/')).forEach(loadFile);
+}
+function addPhoto(e) {
+  [...e.target.files].forEach(loadFile);
+  e.target.value = '';
+}
+function compressImage(dataUrl, maxPx, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxPx || h > maxPx) {
+        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+        else { w = Math.round(w * maxPx / h); h = maxPx; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = dataUrl;
+  });
+}
+
+function loadFile(file) {
+  if (photos.length >= 8) { showToast('Maximum 8 photos'); return; }
+  const r = new FileReader();
+  r.onload = async ev => {
+    const compressed = await compressImage(ev.target.result, 1024, 0.8);
+    photos.push({ dataUrl: compressed });
+    updatePhotoUI();
+  };
+  r.readAsDataURL(file);
+}
+function removePhoto(i) { photos.splice(i, 1); updatePhotoUI(); }
+
+function updatePhotoUI() {
+  const has = photos.length > 0;
+  document.getElementById('drop-zone').style.display = has ? 'none' : 'block';
+  document.getElementById('photos-section').style.display = has ? 'block' : 'none';
+  document.getElementById('obs-section').style.display = has ? 'block' : 'none';
+  document.getElementById('analyze-section').style.display = has ? 'block' : 'none';
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('loader-section').style.display = 'none';
+  document.getElementById('photos-count').textContent = photos.length;
+  document.getElementById('add-more-btn').style.display = photos.length >= 8 ? 'none' : 'inline-block';
+  const grid = document.getElementById('photos-grid');
+  grid.innerHTML = '';
+  photos.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'photo-slot filled';
+    d.innerHTML = `<img src="${p.dataUrl}"><button class="remove-photo" onclick="removePhoto(${i})">✕</button><div class="slot-label">Photo ${i+1}</div>`;
+    grid.appendChild(d);
+  });
+}
+
+function resetScan() {
+  photos = []; currentResult = null;
+  document.getElementById('obs-text').value = '';
+  document.getElementById('drop-zone').style.display = 'block';
+  ['photos-section','obs-section','analyze-section','loader-section','result-section'].forEach(id => document.getElementById(id).style.display = 'none');
+}
+
+async function analyzeImages() {
+  if (!apiKey) { showToast('Clé API manquante !'); return; }
+  if (!photos.length) return;
+
+  ['analyze-section','photos-section','obs-section'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('loader-section').style.display = 'block';
+  document.getElementById('result-section').style.display = 'none';
+
+  let si = 0;
+  const stepEl = document.getElementById('loader-step');
+  stepEl.textContent = STEPS[0];
+  stepTimer = setInterval(() => { si = (si+1) % STEPS.length; stepEl.textContent = STEPS[si]; }, 2000);
+
+  const obs = document.getElementById('obs-text').value.trim();
+  const parts = [];
+
+  photos.forEach((p, i) => {
+    parts.push({ inline_data: { mime_type: p.dataUrl.split(';')[0].split(':')[1], data: p.dataUrl.split(',')[1] } });
+    if (photos.length > 1) parts.push({ text: `[Photo ${i+1}${i===0?' - vêtement':i===1?' - étiquette marque':i===2?' - étiquette composition':' - vue supplémentaire'}]` });
+  });
+
+  const obsBlock = obs ? `\n\nPrécisions de l'utilisateur : ${obs}` : '';
+
+  parts.push({ text: `Tu es un vendeur expert sur Vinted avec des centaines de ventes réussies. Tu analyses les vêtements comme un pro et tu rédiges des annonces qui se vendent vite.
+
+Tu t'inspires du style de ce vendeur modèle dont voici la méthode exacte :
+- Titre court et précis : adjectif + type de vêtement + marque (ex: "Robe d'été légère Mango", "Top vintage y2k Cop Copine")
+- Description en points diamant ♦, une info par ligne, ultra lisible
+- Ordre strict : type/couleur → matière/coupe → détails pratiques (poches, fermetures, élastiques) → taille réelle (avec équivalence si ça taille différemment) → état honnête
+- Honnêteté totale sur les défauts avec ⚠ : "attention ⚠ quelques bouloches assez discret"
+- Préciser la taille réelle si elle diffère de l'étiquette : "Taille XS indiquée mais convient pour un S/36"
+- Pour les vêtements homme : mentionner la taille du modèle (ex: "Modèle 178cm // 72kgs")
+- Hashtags : 4-5 max, courts, collés : #marque#type#couleur#saison
+- Prix : compétitifs et réalistes pour vendre vite, pas pour maximiser la marge
+
+Analyse ${photos.length > 1 ? 'ces photos' : 'cette photo'} du vêtement.${obsBlock}
+
+ÉTAPE 1 — IDENTIFICATION
+Lis toutes les étiquettes visibles. Identifie : marque exacte, type de vêtement, taille étiquette + équivalence (ex: "S / 36 / 8"), coloris précis, matière/composition, instructions lavage si lisibles.
+
+ÉTAPE 2 — ÉTAT VINTED OFFICIEL
+Catégories exactes Vinted :
+- "Neuf avec étiquette" — jamais porté, étiquettes présentes
+- "Neuf sans étiquette" — jamais porté, sans étiquettes
+- "Très bon état" — porté quelques fois, impeccable
+- "Bon état" — usage régulier, légères traces normales
+- "Satisfaisant" — usure visible, défauts à signaler
+Sois honnête. Si défaut visible : note-le avec ⚠.
+
+ÉTAPE 3 — CATÉGORIE VINTED
+Format exact : "Femme > Robes > Robes midi" ou "Homme > Shorts > Shorts de sport"
+
+ÉTAPE 4 — PRIX MARCHÉ
+- Prix neuf catalogue (source nommée)
+- Fourchette prix Vinted réaliste pour cet état
+- Dernière vente similaire sur Vinted si connue
+- Prix conseillé pour vendre en moins d'une semaine
+
+ÉTAPE 5 — TITRE VINTED
+Génère le titre parfait selon la méthode du vendeur modèle : court, descriptif, avec adjectif évocateur. Max 60 caractères.
+
+ÉTAPE 6 — DESCRIPTION VINTED
+Rédige la description complète prête à coller. Respecte EXACTEMENT ce format :
+♦ [type + couleur/motif + marque]
+♦ [matière / coupe / caractéristiques de style]
+♦ [détails pratiques : poches, fermetures, bretelles, élastique...]
+♦ [taille réelle si différente de l'étiquette]
+♦ [état + défauts éventuels avec ⚠ si besoin]
+
+#hashtag1#hashtag2#hashtag3#hashtag4
+
+ÉTAPE 7 — TAGS
+4-5 mots-clés courts pour la recherche Vinted.
+
+ÉTAPE 8 — SCORE DE CONFIANCE
+0-100 selon lisibilité des étiquettes et qualité des photos.
+
+Réponds UNIQUEMENT avec ce JSON valide, sans texte avant ni après, sans backticks :
+{
+  "titre_vinted": "Robe d'été légère Mango",
+  "marque": "Mango",
+  "modele": "Robe débardeur à rayures",
+  "taille": "S / 36 / 8",
+  "taille_reelle": "Taille XS indiquée mais convient pour un S/36",
+  "couleur": "Beige / Marron",
+  "composition": "100% Viscose",
+  "entretien": "Lavage 30°C",
+  "categorie_vinted": "Femme > Robes > Robes d'été",
+  "etat_vinted": "Très bon état",
+  "etat_detail": "Portée quelques fois, quelques bouloches discrètes sur un côté ⚠",
+  "prix_neuf": 39,
+  "prix_neuf_source": "Mango.com",
+  "prix_vinted_min": 8,
+  "prix_vinted_max": 14,
+  "prix_conseille": 9,
+  "prix_derniere_vente": 10,
+  "prix_derniere_vente_source": "Vinted",
+  "devise": "€",
+  "description_vinted": "♦ Robe d'été légère à rayures Mango\\n♦ Beige/Choco\\n♦ Coupé droite / cordon pour cintrer si envie / poche de chaque côté\\n♦ Taille XS indiquée mais convient pour un S/36\\n♦ Très bon état attention ⚠ quelques bouloches sur un côté (assez discret)\\n\\n#mango#summer#dress#stripes",
+  "tags": ["mango", "robe", "summer", "stripes"],
+  "confiance": 91
+}` });
+
+  try {
+    // Prompt texte EN PREMIER dans parts, puis images
+    const orderedParts = [{ text: parts[parts.length - 1].text }, ...parts.slice(0, -1).filter(p => p.inline_data)];
+
+    const makeBody = (model, withSearch) => ({
+      contents: [{ role: 'user', parts: orderedParts }],
+      ...(withSearch ? { tools: [{ google_search: {} }] } : {
+        generationConfig: { temperature: 0.2, top_p: 0.8 }
+      }),
+      generationConfig: { temperature: 0.2, top_p: 0.8 }
+    });
+
+    const tryFetch = async (model, withSearch) => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(makeBody(model, withSearch)) }
+      );
+      return r.json();
+    };
+
+    let data;
+    // Essai 1 : gemini-2.5-flash-lite avec search
+    data = await tryFetch('gemini-2.5-flash-lite', true);
+    // Essai 2 : gemini-2.5-flash avec search si lite indispo
+    if (data.error && (data.error.code === 404 || data.error.code === 503)) {
+      data = await tryFetch('gemini-2.5-flash', true);
+    }
+    // Essai 3 : sans search si search pose problème
+    if (data.error) {
+      data = await tryFetch('gemini-2.5-flash-lite', false);
+    }
+
+    clearInterval(stepTimer);
+    if (data.error) throw new Error(data.error.message);
+    const rawText = (data.candidates?.[0]?.content?.parts || []).filter(p => p.text).map(p => p.text).join('');
+    const match = rawText.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Réponse IA invalide');
+    const r = JSON.parse(match[0]);
+    currentResult = { ...r, photos: photos.map(p => p.dataUrl) };
+    displayResult(r);
+  } catch(err) {
+    clearInterval(stepTimer);
+    displayError(err.message);
+  }
+}
+
+function displayResult(r) {
+  document.getElementById('loader-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'block';
+  document.getElementById('error-box').style.display = 'none';
+
+  // Photos mosaïque
+  const pg = document.getElementById('result-photos-grid');
+  const cls = ['','one','two','three','four'][Math.min(photos.length,4)];
+  pg.className = 'result-photos ' + cls;
+  pg.innerHTML = photos.map(p => `<div class="result-photo"><img src="${p.dataUrl}" alt=""></div>`).join('');
+
+  document.getElementById('r-brand').textContent = r.marque || '—';
+  document.getElementById('r-name').textContent = r.titre_vinted || r.modele || '—';
+  document.getElementById('r-size').textContent = [r.taille_reelle || r.taille, r.couleur].filter(Boolean).join(' · ') || '—';
+
+  const conf = Math.min(100, Math.max(0, r.confiance || 0));
+  document.getElementById('r-conf-badge').textContent = conf + '% fiable';
+  document.getElementById('conf-pct').textContent = conf + '%';
+  setTimeout(() => document.getElementById('conf-fill').style.width = conf + '%', 100);
+
+  const dv = r.devise || '€';
+  document.getElementById('p-neuf').textContent = r.prix_neuf ? r.prix_neuf + ' ' + dv : 'N/A';
+  document.getElementById('p-neuf-src').textContent = r.prix_neuf_source || '';
+  document.getElementById('p-conseil').textContent = r.prix_conseille ? r.prix_conseille + ' ' + dv : (r.prix_vinted_min ? r.prix_vinted_min + '–' + r.prix_vinted_max + ' ' + dv : '—');
+  document.getElementById('p-derniere').textContent = r.prix_derniere_vente ? r.prix_derniere_vente + ' ' + dv : 'N/A';
+  document.getElementById('p-derniere-src').textContent = r.prix_derniere_vente_source || '';
+
+  // Tags
+  const tagsEl = document.getElementById('r-tags');
+  tagsEl.innerHTML = '';
+  if (r.etat_vinted) tagsEl.innerHTML += `<span class="tag">${r.etat_vinted}</span>`;
+  (r.tags || []).slice(0,6).forEach(t => tagsEl.innerHTML += `<span class="tag gray">#${t}</span>`);
+
+  document.getElementById('r-cat').textContent = r.categorie_vinted || '—';
+  document.getElementById('r-etat').textContent = r.etat_detail ? r.etat_vinted + ' — ' + r.etat_detail : r.etat_vinted || '—';
+  document.getElementById('r-compo').textContent = r.composition || '—';
+  document.getElementById('r-entretien').textContent = r.entretien || '—';
+
+  document.getElementById('r-desc').textContent = r.description_vinted || '—';
+
+  const copyBtn = document.getElementById('copy-btn');
+  copyBtn.textContent = 'Copier';
+  copyBtn.className = 'copy-btn';
+
+  document.getElementById('save-btn').textContent = '+ Armoire';
+  document.getElementById('save-btn').disabled = false;
+}
+
+function displayError(msg) {
+  document.getElementById('loader-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'block';
+  const pg = document.getElementById('result-photos-grid');
+  pg.className = 'result-photos one';
+  pg.innerHTML = photos.length ? `<div class="result-photo"><img src="${photos[0].dataUrl}" alt=""></div>` : '';
+  ['r-brand','r-name','r-size','p-neuf','p-conseil','p-derniere','r-cat','r-etat','r-compo','r-entretien','r-desc'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('r-tags').innerHTML = '';
+  document.getElementById('conf-fill').style.width = '0%';
+  document.getElementById('conf-pct').textContent = '—';
+  document.getElementById('r-conf-badge').textContent = '—';
+  const eb = document.getElementById('error-box');
+  eb.style.display = 'block';
+  eb.textContent = '⚠ ' + msg + (msg.includes('fetch') ? ' — Hébergez l\'app sur GitHub Pages ou utilisez python -m http.server 8080' : '');
+  document.getElementById('save-btn').disabled = true;
+}
+
+function copyDesc() {
+  const desc = document.getElementById('r-desc').textContent;
+  if (!desc || desc === '—') return;
+  navigator.clipboard.writeText(desc).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copié !';
+    btn.className = 'copy-btn copied';
+    setTimeout(() => { btn.textContent = 'Copier'; btn.className = 'copy-btn'; }, 2000);
+  });
+}
+
+function saveToArmoire() {
+  if (!currentResult) return;
+  armoire.unshift({
+    id: Date.now(),
+    marque: currentResult.marque,
+    modele: currentResult.modele,
+    taille: currentResult.taille,
+    etat: currentResult.etat_vinted,
+    prix_conseille: currentResult.prix_conseille,
+    prix_min: currentResult.prix_vinted_min,
+    prix_max: currentResult.prix_vinted_max,
+    devise: currentResult.devise || '€',
+    confiance: currentResult.confiance,
+    photo: currentResult.photos?.[0] || null,
+    date: new Date().toLocaleDateString('fr-FR')
+  });
+  localStorage.setItem('fripia_armoire', JSON.stringify(armoire));
+  updateBadge();
+  document.getElementById('save-btn').textContent = '✓ Ajouté';
+  document.getElementById('save-btn').disabled = true;
+  showToast('Ajouté à l\'armoire ✓');
+}
+
+function renderArmoire() {
+  const grid = document.getElementById('armoire-grid');
+  const empty = document.getElementById('armoire-empty');
+  grid.innerHTML = '';
+  if (!armoire.length) {
+    empty.style.display = 'block'; grid.style.display = 'none';
+    document.getElementById('armoire-total').textContent = '0 €'; return;
+  }
+  empty.style.display = 'none'; grid.style.display = 'grid';
+  let total = 0;
+  armoire.forEach(item => {
+    const p = item.prix_conseille || (item.prix_min && item.prix_max ? Math.round((item.prix_min+item.prix_max)/2) : 0);
+    total += p;
+    const el = document.createElement('div');
+    el.className = 'armoire-item';
+    el.innerHTML = `
+      <button class="armoire-del" onclick="deleteItem(${item.id},event)">✕</button>
+      ${item.photo ? `<img class="armoire-thumb" src="${item.photo}" alt="">` : `<div class="armoire-thumb-empty">👗</div>`}
+      <div class="armoire-info">
+        <div class="armoire-brand">${item.marque || '—'}</div>
+        <div class="armoire-name">${item.modele || '—'}</div>
+        <div class="armoire-price">${p ? p + ' ' + item.devise : '—'}</div>
+        <div class="armoire-state">${item.etat || ''} · ${item.taille || ''}</div>
+      </div>`;
+    grid.appendChild(el);
+  });
+  document.getElementById('armoire-total').textContent = total ? Math.round(total) + ' €' : '—';
+}
+
+function deleteItem(id, e) {
+  e.stopPropagation();
+  if (!confirm('Retirer ce vêtement ?')) return;
+  armoire = armoire.filter(i => i.id !== id);
+  localStorage.setItem('fripia_armoire', JSON.stringify(armoire));
+  renderArmoire(); updateBadge();
+}
+
+function clearArmoire() {
+  if (!confirm('Vider toute l\'armoire ?')) return;
+  armoire = [];
+  localStorage.setItem('fripia_armoire', JSON.stringify(armoire));
+  renderArmoire(); updateBadge();
+  showToast('Armoire vidée');
+}
+
+function updateBadge() { document.getElementById('count-badge').textContent = armoire.length; }
+
+function updateStats() {
+  let total = 0, topV = 0, topN = '—';
+  armoire.forEach(i => {
+    const p = i.prix_conseille || 0;
+    total += p;
+    if (p > topV) { topV = p; topN = [i.marque, i.modele].filter(Boolean).join(' '); }
+  });
+  document.getElementById('st-count').textContent = armoire.length;
+  document.getElementById('st-total').textContent = Math.round(total) + ' €';
+  document.getElementById('st-top').textContent = topN;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+init();
+</script>
+</body>
+</html>
